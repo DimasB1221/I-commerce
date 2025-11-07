@@ -78,9 +78,9 @@ const HamburgerIcon = ({
 
 // Default navigation links
 const defaultNavigationLinks = [
-  { href: '#', label: 'Products' },
-  { href: '#', label: 'Categories' },
-  { href: '#', label: 'Deals' },
+  { href: '#', label: 'Products' ,className: 'bg-white/0 backdrop-blur-md'},
+  { href: '#', label: 'Orders' },
+  { href: '#', label: 'About us' },
 ];
 
 export const Navbar04 = React.forwardRef((
@@ -248,18 +248,7 @@ export const Navbar04 = React.forwardRef((
               </NavigationMenu>
             )}
             {/* Search form */}
-            <form onSubmit={handleSearchSubmit} className="relative">
-              <Input
-                id={searchId}
-                name="search"
-                className="peer h-8 ps-8 pe-2"
-                placeholder={searchPlaceholder}
-                type="search" />
-              <div
-                className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2 peer-disabled:opacity-50">
-                <SearchIcon size={16} />
-              </div>
-            </form>
+            
           </div>
         </div>
         {/* Right side */}
