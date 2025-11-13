@@ -1,6 +1,8 @@
-'use client';;
+'use client';
+
 import * as React from 'react';
 import { useEffect, useState, useRef, useId } from 'react';
+import { useRouter } from 'next/navigation'; // ✅ Tambahan penting
 import { SearchIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,10 +50,7 @@ const Logo = (props) => {
 };
 
 // Hamburger icon component
-const HamburgerIcon = ({
-  className,
-  ...props
-}) => (
+const HamburgerIcon = ({ className, ...props }) => (
   <svg
     className={cn('pointer-events-none', className)}
     width={16}
@@ -78,7 +77,7 @@ const HamburgerIcon = ({
 
 // Default navigation links
 const defaultNavigationLinks = [
-  { href: '#', label: 'Products' ,className: 'bg-white/0 backdrop-blur-md'},
+  { href: '#', label: 'Products', className: 'bg-white/0 backdrop-blur-md' },
   { href: '#', label: 'Orders' },
   { href: '#', label: 'About us' },
 ];
@@ -89,8 +88,8 @@ export const Navbar04 = React.forwardRef((
     logo = <Logo />,
     logoHref = '#',
     navigationLinks = defaultNavigationLinks,
-    signInText = 'Sign In',
-    signInHref = '#signin',
+    signInText = 'Login',
+    signInHref = '/login', // ✅ Ganti default href ke /login
     cartText = 'Cart',
     cartHref = '#cart',
     cartCount = 2,
@@ -105,62 +104,50 @@ export const Navbar04 = React.forwardRef((
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef(null);
   const searchId = useId();
+  const router = useRouter(); // ✅ Router instance dari Next.js
 
   useEffect(() => {
     const checkWidth = () => {
       if (containerRef.current) {
         const width = containerRef.current.offsetWidth;
-        setIsMobile(width < 768); // 768px is md breakpoint
+        setIsMobile(width < 768); // 768px = md breakpoint
       }
     };
 
     checkWidth();
-
     const resizeObserver = new ResizeObserver(checkWidth);
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
-    }
-
-    return () => {
-      resizeObserver.disconnect();
-    };
+    if (containerRef.current) resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
   }, []);
 
-  // Combine refs
   const combinedRef = React.useCallback((node) => {
     containerRef.current = node;
-    if (typeof ref === 'function') {
-      ref(node);
-    } else if (ref) {
-      ref.current = node;
-    }
+    if (typeof ref === 'function') ref(node);
+    else if (ref) ref.current = node;
   }, [ref]);
 
-  const handleSearchSubmit = (e) => {
+  const handleLoginClick = (e) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const query = formData.get('search');
-    if (onSearchSubmit) {
-      onSearchSubmit(query);
-    }
+    router.push(signInHref); // ✅ Navigasi ke halaman login
+  };
+
+  const handleCartClick = (e) => {
+    e.preventDefault();
+    if (onCartClick) onCartClick();
+    else router.push(cartHref);
   };
 
   return (
     <header
       ref={combinedRef}
       className={cn(
-        // posisi tetap di atas aurora
-    'fixed top-0 z-50 w-full border-b border-white/10 px-4 md:px-6 [&_*]:no-underline',
-    // efek transparan + blur agar aurora terlihat
-    'bg-white/10 backdrop-blur-md',
-    className
+        'fixed top-0 z-50 w-full border-b border-white/10 px-4 md:px-6 [&_*]:no-underline bg-white/10 backdrop-blur-md',
+        className
       )}
       {...props}>
-      <div
-        className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4 ">
+      <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4">
         {/* Left side */}
         <div className="flex flex-1 items-center gap-2">
-          {/* Mobile menu trigger */}
           {isMobile && (
             <Popover>
               <PopoverTrigger asChild>
@@ -176,26 +163,20 @@ export const Navbar04 = React.forwardRef((
                   <NavigationMenuList className="flex-col items-start gap-0">
                     {navigationLinks.map((link, index) => (
                       <NavigationMenuItem key={index} className="w-full">
-                        <button
-                          onClick={(e) => e.preventDefault()}
+                        <NavigationMenuLink
+                          href={link.href}
                           className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline">
                           {link.label}
-                        </button>
+                        </NavigationMenuLink>
                       </NavigationMenuItem>
                     ))}
                     <NavigationMenuItem className="w-full" role="presentation" aria-hidden={true}>
-                      <div
-                        role="separator"
-                        aria-orientation="horizontal"
-                        className="bg-border -mx-1 my-1 h-px" />
+                      <div className="bg-border -mx-1 my-1 h-px" />
                     </NavigationMenuItem>
                     <NavigationMenuItem className="w-full">
                       <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (onSignInClick) onSignInClick();
-                        }}
-                        className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline">
+                        onClick={handleLoginClick}
+                        className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                         {signInText}
                       </button>
                     </NavigationMenuItem>
@@ -203,10 +184,7 @@ export const Navbar04 = React.forwardRef((
                       <Button
                         size="sm"
                         className="mt-0.5 w-full text-left text-sm"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (onCartClick) onCartClick();
-                        }}>
+                        onClick={handleCartClick}>
                         <span className="flex items-baseline gap-2">
                           {cartText}
                           <span className="text-primary-foreground/60 text-xs">
@@ -225,12 +203,9 @@ export const Navbar04 = React.forwardRef((
             <button
               onClick={(e) => e.preventDefault()}
               className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer">
-              <div className="text-2xl">
-                {logo}
-              </div>
+              <div className="text-2xl">{logo}</div>
               <span className="hidden font-bold text-xl sm:inline-block">shadcn.io</span>
             </button>
-            {/* Navigation menu */}
             {!isMobile && (
               <NavigationMenu className="flex">
                 <NavigationMenuList className="gap-1">
@@ -238,7 +213,6 @@ export const Navbar04 = React.forwardRef((
                     <NavigationMenuItem key={index}>
                       <NavigationMenuLink
                         href={link.href}
-                        onClick={(e) => e.preventDefault()}
                         className="text-muted-foreground hover:text-primary py-1.5 font-medium transition-colors cursor-pointer group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50">
                         {link.label}
                       </NavigationMenuLink>
@@ -247,8 +221,6 @@ export const Navbar04 = React.forwardRef((
                 </NavigationMenuList>
               </NavigationMenu>
             )}
-            {/* Search form */}
-            
           </div>
         </div>
         {/* Right side */}
@@ -258,19 +230,13 @@ export const Navbar04 = React.forwardRef((
               variant="ghost"
               size="sm"
               className="text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-              onClick={(e) => {
-                e.preventDefault();
-                if (onSignInClick) onSignInClick();
-              }}>
+              onClick={handleLoginClick}>
               {signInText}
             </Button>
             <Button
               size="sm"
               className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
-              onClick={(e) => {
-                e.preventDefault();
-                if (onCartClick) onCartClick();
-              }}>
+              onClick={handleCartClick}>
               <span className="flex items-baseline gap-2">
                 {cartText}
                 <span className="text-primary-foreground/60 text-xs">

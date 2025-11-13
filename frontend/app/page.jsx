@@ -2,6 +2,7 @@ import Image from "next/image";
 import Navbar from "../components/navbar.jsx";
 import Hero from '@/components/hero.jsx'
 import Card from '@/components/card.jsx'
+import Footer from "@/components/footer.jsx"
 
 export default function Home() {
   return (
@@ -19,6 +20,7 @@ export default function Home() {
             <h1 className="mt-5 text-5xl md:text-6xl font-bold text-gray-900 leading-tight">About us</h1>
               <Image 
                 src="/AboutUsPhoto3.jpg"
+                alt="iphone"
                 width={900}
                 height={500}
                 className="w-[100%] m-auto"
@@ -35,13 +37,15 @@ export default function Home() {
           </div>
         </section>
       {/* Product section */}
-        <section className="product h-[1000px]">
+        <section className="product">
           <h1 className="mt-5 text-5xl md:text-6xl font-bold text-gray-900 leading-tight text-center">Product</h1>
             <div className="product-body">
               <Card/>
             </div>
         </section>
       </main>
+      {/* Footer */}
+      <Footer />
     </>
   );
 }
