@@ -1,4 +1,4 @@
-const Footer = () => {
+function Footer (){ 
     return (
         <>
             <footer className="footer sm:footer-horizontal bg-black text-white p-10">
