@@ -10,14 +10,15 @@ export const authService = {
       });
 
       // Assuming server returns: { token: "...", user: {...} }
-      const { token, user } = response.data;
-      console.log(response.data);
+      const { token, name } = response.data;
+      console.log(token);
+      console.log(name);
 
       // Save token to localStorage
       if (typeof window !== "undefined") {
         localStorage.setItem("token", token);
-        if (user) {
-          localStorage.setItem("user", JSON.stringify(user));
+        if (name) {
+          localStorage.setItem("name", JSON.stringify(name));
         }
       }
 
@@ -42,7 +43,7 @@ export const authService = {
       // Always clear local storage
       if (typeof window !== "undefined") {
         localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        localStorage.removeItem("name");
       }
     }
   },
@@ -57,7 +58,7 @@ export const authService = {
   // Get current user
   getCurrentUser() {
     if (typeof window === "undefined") return null;
-    const userStr = localStorage.getItem("user");
+    const userStr = localStorage.getItem("name");
     return userStr ? JSON.parse(userStr) : null;
   },
 
