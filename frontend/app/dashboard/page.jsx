@@ -1,7 +1,13 @@
+import Sidebar1 from "@/components/sidebar"
+
+
+
 export default function Dashboard (){
     return (
         <>
-            <p>Kamu berhasil login</p>
+            <header>
+                <Sidebar1 />
+            </header>
         </>
     )
 }
