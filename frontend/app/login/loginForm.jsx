@@ -17,48 +17,43 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
 import { authService } from "@/lib/auth";
 
-export const title = "Login Card";
 
 const LoginForm = () => {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
+  const router = useRouter();
 
+
+// handle login default
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Clear previous errors
-    setError("");
 
-    // Basic validation
+    setError('');
+
     if (!email || !password) {
-      setError("Please enter both email and password");
-      return;
+        setError("please enter email and password");
+        return
     }
-
     setLoading(true);
-
     try {
-      const result = await authService.login(email, password);
-
-      if (result.success) {
-        // Success! Redirect to dashboard
-        router.push("/dashboard");
-        // Alternative: window.location.href = "/dashboard";
-      } else {
-        // Show error message
-        setError(result.error || "Login failed. Please try again.");
-      }
-    } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
-      console.error("Login error:", err);
+        const result = await authService.login(email,password);
+        if (result.success) {
+            router.push("/dashboard");
+        } else {
+            setError(result.error || "Login failed pls try again");
+        }
+    } catch (error) {
+        setError("An unexpected error occurred. Please try again.");
+        console.error("Login failed", error)
+        return
     } finally {
-      setLoading(false);
+        setLoading(false)
     }
-  };
+  }
 
+//   handle login google
   const handleGoogleLogin = async () => {
     setLoading(true);
     setError("");
