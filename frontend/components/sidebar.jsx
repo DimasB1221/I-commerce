@@ -3,11 +3,11 @@ import { Sidebar  } from "lucide-react"
 const Sidebar1 = () => {
     return (
         <>
-            <div className="drawer lg:drawer-open">
+            <div className="drawer lg:drawer-open ">
                 <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
                 <div className="drawer-content">
                     {/* Navbar */}
-                    <nav className="navbar w-full bg-background text-black">
+                    <nav className="navbar w-full  text-black ">
                     <label htmlFor="my-drawer-4" aria-label="open sidebar" className=" btn btn-square btn-ghost">
                         {/* Sidebar toggle icon */}
                         <Sidebar />
@@ -17,10 +17,6 @@ const Sidebar1 = () => {
                         <p className="text-sm">Product Management System</p>
                     </div>
                     </nav>
-                    {/* Page content here */}
-                    <div className="p-4 h-screen bg-neutral-100">
-                        <p>Tes</p>
-                    </div>
                 </div>
 
                 <div className="drawer-side is-drawer-close:overflow-visible bg-white">
@@ -42,7 +38,7 @@ const Sidebar1 = () => {
                         <button className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Settings">
                             {/* Settings icon */}
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor" className="my-1.5 inline-block size-4"><path d="M20 7h-9"></path><path d="M14 17H5"></path><circle cx="17" cy="17" r="3"></circle><circle cx="7" cy="7" r="3"></circle></svg>
-                            <span className="is-drawer-close:hidden">Settings</span>
+                            <span className="is-drawer-close:hidden">Products</span>
                         </button>
                         </li>
                     </ul>
