@@ -128,6 +128,11 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+.shadow-top-bottom-soft {
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.10),
+    0 -4px 10px rgba(0, 0, 0, 0.06);
+}
 
 @layer base {
   * {
@@ -135,5 +140,14 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1 {
+    @apply font-bold text-[20px]
+  }
+  p {
+    @apply text-gray-600
+  }
+  .info-card {
+    @apply bg-background py-[15px] px-5 grid grid-cols-2 flex rounded-lg
   }
 }
