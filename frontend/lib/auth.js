@@ -11,8 +11,6 @@ export const authService = {
 
       // Assuming server returns: { token: "...", user: {...} }
       const { token, name } = response.data;
-      console.log(token);
-      console.log(name);
 
       // Save token to localStorage
       if (typeof window !== "undefined") {
@@ -21,6 +19,7 @@ export const authService = {
           localStorage.setItem("name", JSON.stringify(name));
         }
       }
+      console.log(localStorage.getItem("token", response.data.token));
 
       return { success: true, data: response.data };
     } catch (error) {

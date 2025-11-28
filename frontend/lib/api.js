@@ -3,7 +3,9 @@ import { redirect } from "next/navigation";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
-  headers: "application/json",
+  headers: {
+    "Content-Type": "application/json",
+  },
   timeout: 10000,
 });
 
@@ -13,13 +15,13 @@ api.interceptors.request.use(
       const token = localStorage.getItem("token");
 
       if (token) {
-        config.headers.authorization = `Bearer${token}`;
+        config.headers.authorization = `Bearer ${token}`;
       }
     }
     return config;
   },
   (error) => {
-    Promise.reject(error);
+    return Promise.reject(error);
   }
 );
 
