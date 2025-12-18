@@ -10,7 +10,7 @@ const PRODUCTS_ENDPOINT = "/products";
  * @param {string} data.description
  * @param {string} data.category
  * @param {number} data.stock
- * @param {File} data.image
+ * @param {File} data.images
  */
 export const createProduct = async (data) => {
   const formData = new FormData();
@@ -20,11 +20,11 @@ export const createProduct = async (data) => {
   formData.append("description", data.description);
   formData.append("category", data.category);
   formData.append("stock", parseInt(data.stock));
-  formData.append("images", data.image);
+  formData.append("images", data.images);
 
-  const response = await api.post("/products", formData);
-
-  console.log(response.data);
+  const response = await api.post("/products", formData, {
+    headers: { "Content-Type": undefined },
+  });
 
   return response.data;
 };
@@ -32,8 +32,14 @@ export const createProduct = async (data) => {
 /**
  * Get all products
  */
-export const getProducts = async () => {
-  const response = await api.get("/products");
+export const getProducts = async (pageNumber, limit) => {
+  const response = await api.get(`${PRODUCTS_ENDPOINT}`, {
+    params: {
+      page: pageNumber,
+      limit: limit,
+    },
+  });
+  console.log(response.data);
   return response.data;
 };
 
@@ -60,11 +66,23 @@ export const updateProduct = async (id, data) => {
   formData.append("category", data.category);
   formData.append("stock", parseInt(data.stock));
 
-  if (data.image) {
-    formData.append("image", data.image);
+  if (data.images) {
+    formData.append("images", data.images);
   }
 
-  const response = await api.put(`${PRODUCTS_ENDPOINT}/${id}`, formData);
+  const token = localStorage.getItem("token");
+  console.log("Update Product - ID:", id);
+
+  if (!token) {
+    throw new Error("Authentication token not found");
+  }
+
+  const response = await api.put(`${PRODUCTS_ENDPOINT}/${id}`, formData, {
+    headers: {
+      "Content-Type": undefined,
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   return response.data;
 };
