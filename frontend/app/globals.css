@@ -136,7 +136,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50 ;
   }
   body {
     @apply bg-background text-foreground;
@@ -149,5 +149,8 @@
   }
   .info-card {
     @apply bg-background py-[15px] px-5 grid grid-cols-2 flex rounded-lg
+  }
+  thead,th,td {
+    @apply border-1 border-neutral-500
   }
 }
