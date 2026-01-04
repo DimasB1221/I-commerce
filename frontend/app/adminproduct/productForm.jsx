@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -8,8 +8,9 @@ import {
   DropzoneEmptyState,
 } from "@/components/ui/shadcn-io/dropzone/dropzone.jsx";
 import { createProduct } from "@/lib/productServices";
+import { updateProduct } from "@/lib/productServices";
 
-const ProductForm = ({ onSuccess }) => {
+const ProductForm = ({ onSuccess, productToEdit, onCancelEdit }) => {
   const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -21,6 +22,25 @@ const ProductForm = ({ onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Populate form when editing
+  useEffect(() => {
+    if (productToEdit) {
+      setFormData({
+        name: productToEdit.name || "",
+        price: productToEdit.price || "",
+        description: productToEdit.description || "",
+        category: productToEdit.category || "",
+        stock: productToEdit.stock || "",
+      });
+      setFiles([]);
+      setError("");
+
+      // Open modal
+      const modal = document.getElementById("my_modal_3");
+      if (modal) modal.showModal();
+    }
+  }, [productToEdit]);
 
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -43,12 +63,19 @@ const ProductForm = ({ onSuccess }) => {
     setFiles([]);
   }, []);
 
+  const handleClose = () => {
+    document.getElementById("my_modal_3")?.close();
+    resetForm();
+    if (onCancelEdit) onCancelEdit();
+  };
+
   const validateForm = () => {
     const { name, price, description, category, stock } = formData;
     if (!name || !price || !description || !category || !stock) {
       return "Please fill in all fields";
     }
-    if (files.length === 0) {
+    // Image is required only for creation
+    if (!productToEdit && files.length === 0) {
       return "Please upload an image";
     }
     if (parseFloat(price) < 0 || parseInt(stock) < 0) {
@@ -71,9 +98,26 @@ const ProductForm = ({ onSuccess }) => {
     setSuccess("");
 
     try {
-      await createProduct({ ...formData, image: files[0] });
+      if (productToEdit) {
+        // Update mode
+        const updateData = { ...formData };
+        // Only include images if a new file was selected
+        if (files.length > 0) {
+          updateData.images = files[0];
+        } else {
+          updateData.images = null;
+        }
 
-      setSuccess("Product created successfully!");
+        await updateProduct(productToEdit._id || productToEdit.id, updateData);
+        setSuccess("Product updated successfully!");
+        console.log(productToEdit);
+        console.log(formData);
+      } else {
+        // Create mode
+        await createProduct({ ...formData, images: files[0] });
+        setSuccess("Product created successfully!");
+      }
+
       resetForm();
 
       // Notify parent component to refresh
@@ -82,11 +126,16 @@ const ProductForm = ({ onSuccess }) => {
       }
 
       setTimeout(() => {
-        document.getElementById("my_modal_3")?.close();
+        handleClose();
         setSuccess("");
       }, 1500);
     } catch (err) {
-      setError(err?.message || "Failed to create product");
+      setError(
+        err?.message ||
+          (productToEdit
+            ? "Failed to update product"
+            : "Failed to create product")
+      );
     } finally {
       setLoading(false);
     }
@@ -96,20 +145,29 @@ const ProductForm = ({ onSuccess }) => {
     <>
       <button
         className="btn btn-primary m-4"
-        onClick={() => document.getElementById("my_modal_3")?.showModal()}
+        onClick={() => {
+          resetForm();
+          document.getElementById("my_modal_3")?.showModal();
+        }}
       >
         Tambah Product
       </button>
 
-      <dialog id="my_modal_3" className="modal">
-        <div className="modal-box w-11/12 max-w-2xl">
+      <dialog id="my_modal_3" className="modal" onClose={handleClose}>
+        <div className="modal-box w-11/12 max-w-2xl bg-neutral-100">
           <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+            <button
+              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              onClick={handleClose}
+              type="button"
+            >
               ✕
             </button>
           </form>
 
-          <h3 className="font-bold text-lg mb-4">Tambah Product</h3>
+          <h3 className="font-bold text-lg mb-4">
+            {productToEdit ? "Edit Product" : "Tambah Product"}
+          </h3>
 
           {error && (
             <div className="alert alert-error mb-4">
@@ -157,7 +215,7 @@ const ProductForm = ({ onSuccess }) => {
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Product description"
-                className="textarea textarea-bordered w-full h-24"
+                className="textarea border border-gray-200 w-full h-24 bg-neutral-100"
               />
             </div>
 
@@ -201,32 +259,37 @@ const ProductForm = ({ onSuccess }) => {
                   Selected: {files[0].name}
                 </p>
               )}
+              {productToEdit && files.length === 0 && (
+                <p className="mt-2 text-sm text-gray-500">
+                  Leave empty to keep current image
+                </p>
+              )}
             </div>
 
             <div className="modal-action">
               <button
                 type="submit"
-                className="btn btn-primary"
+                className="btn border-none bg-blue-500 p-2 text-white font-bold"
                 disabled={loading}
               >
                 {loading ? (
                   <span className="loading loading-spinner loading-sm" />
+                ) : productToEdit ? (
+                  "Update Product"
                 ) : (
                   "Create Product"
                 )}
               </button>
-              <button
-                type="button"
-                className="btn"
-                onClick={() => document.getElementById("my_modal_3")?.close()}
-              >
+              <button type="button" className="btn" onClick={handleClose}>
                 Cancel
               </button>
             </div>
           </form>
         </div>
         <form method="dialog" className="modal-backdrop">
-          <button>close</button>
+          <button type="button" onClick={handleClose}>
+            close
+          </button>
         </form>
       </dialog>
     </>
